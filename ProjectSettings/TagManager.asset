@@ -51,5 +51,8 @@ TagManager:
   - name: Foreground
     uniqueID: 1897430269
     locked: 0
+  - name: Table
+    uniqueID: 1679317767
+    locked: 0
   m_RenderingLayers:
   - Default
