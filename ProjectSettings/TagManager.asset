@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - Interact
+  - H_L Interact
+  - RPS_RR Interact
   layers:
   - Default
   - TransparentFX
@@ -53,6 +55,9 @@ TagManager:
     locked: 0
   - name: Table
     uniqueID: 1679317767
+    locked: 0
+  - name: Card
+    uniqueID: 1883648327
     locked: 0
   m_RenderingLayers:
   - Default
