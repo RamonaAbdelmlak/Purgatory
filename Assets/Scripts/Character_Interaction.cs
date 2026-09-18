@@ -38,6 +38,7 @@ public class Character_Interaction : MonoBehaviour
     public GameObject RPS_RR_Interact;
     public RPS_RR_Logic RPS_RR_Logic;
     public Higher_and_Lower_Logic higherAndLowerLogic;
+    public bool interactable = true;
     public bool RPS_RR_Interactable = false;
     public bool h_L_Interactable = false;
     public bool nextStepH_L = false;
@@ -115,8 +116,9 @@ public class Character_Interaction : MonoBehaviour
     }
     void OnInteract(InputValue value)
     {
-        if (h_L_Interactable)
+        if (h_L_Interactable && interactable)
         {
+            interactable = false;
             firstNumber = 0;
             secondNumber = 0;
             table.GetComponent<SpriteRenderer>().enabled = true;
@@ -128,8 +130,9 @@ public class Character_Interaction : MonoBehaviour
             firstNumber = higherAndLowerLogic.GetFirstNumber();
             nextStepH_L = true;
         }
-        if (RPS_RR_Interactable)
+        if (RPS_RR_Interactable && interactable)
         {
+            interactable = false;
             tmp.GetComponent<TextMeshProUGUI>().enabled = false;
             rRockTmp.enabled = true;
             qPaperTmp.enabled = true;
@@ -268,6 +271,7 @@ public class Character_Interaction : MonoBehaviour
         table.GetComponent<SpriteRenderer>().enabled = false;
         higherTmp.enabled = false;
         lowerTmp.enabled = false;
+        interactable = true;
         if (higherAndLowerLogic.GetFirstCardClubs())
         {
             firstNumber += 13;
@@ -320,5 +324,6 @@ public class Character_Interaction : MonoBehaviour
         enemyHand.GetComponent<SpriteRenderer>().enabled = false;
         characterMovement.canMove = true;
         nextStepRPS_RR = false;
+        interactable = true;
     }
 }
