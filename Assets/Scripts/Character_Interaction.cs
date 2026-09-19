@@ -5,6 +5,7 @@ using System.Collections;
 using Unity.VisualScripting;
 using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine.UI;
+using UnityEngine.TextCore.Text;
 
 public class Character_Interaction : MonoBehaviour
 {
@@ -84,6 +85,11 @@ public class Character_Interaction : MonoBehaviour
     public GameObject gate;
     public GameObject angelOne;
     public GameObject angelTwo;
+    public GameObject creditsBackground;
+    public GameObject creditsWinText;
+    public GameObject creditsSubText;
+    public GameObject credits;
+    public GameObject creditsThanks;
 
     
 
@@ -151,6 +157,11 @@ public class Character_Interaction : MonoBehaviour
         gate = GameObject.Find("Purgatory_Gates_0");
         angelOne = GameObject.Find("Purgatory_AngelNPC_0");
         angelTwo = GameObject.Find("Purgatory_AngelNPC_1");    
+        creditsBackground = GameObject.Find ("Credits Background");
+        creditsWinText = GameObject.Find("Credits Win Text");
+        creditsSubText = GameObject.Find("Credits Sub Text");
+        credits = GameObject.Find("Credits");
+        creditsThanks = GameObject.Find("Credits Thanks");
     }
 
     // Update is called once per frame
@@ -184,6 +195,11 @@ public class Character_Interaction : MonoBehaviour
             tmp.enabled = true;
             ticketCounterInteractable = true;
         }
+        if(collision.gameObject.tag == "Win_Field")
+        {
+            Credits();
+        }
+
     }
     void OnTriggerExit2D(Collider2D collision)
     {
@@ -569,5 +585,14 @@ public class Character_Interaction : MonoBehaviour
         Destroy(gate);
         angelOne.transform.Translate(-1,0,0);
         angelTwo.transform.Translate(1,0,0);
+    }
+    public void Credits()
+    {
+        characterMovement.canMove = false;
+        creditsBackground.GetComponent<UnityEngine.UI.Image>().enabled = true;
+        creditsWinText.GetComponent<TextMeshProUGUI>().enabled = true;
+        creditsSubText.GetComponent<TextMeshProUGUI>().enabled = true;
+        credits.GetComponent<TextMeshProUGUI>().enabled = true;
+        creditsThanks.GetComponent<TextMeshProUGUI>().enabled = true;
     }
 }
