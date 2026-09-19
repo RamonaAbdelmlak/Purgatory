@@ -35,6 +35,7 @@ public class OaE_Logic : MonoBehaviour
     public int secondIndex;
     public int newFirstIndex;
     public int newSecondIndex;
+    public Coin_Logic coin_Logic;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -45,6 +46,7 @@ public class OaE_Logic : MonoBehaviour
         tmp = interactText.GetComponent<TextMeshProUGUI>();
         character_Interaction = player.GetComponent<Character_Interaction>();
         characterMovement = player.GetComponent<Character_Movement>();
+        coin_Logic = player.GetComponent<Coin_Logic>();
         randDieOne = GameObject.Find("Random Die 1");
         randDieTwo = GameObject.Find("Random Die 2");
         randDieOneAnimator = randDieOne.GetComponent<Animator>();
@@ -93,6 +95,7 @@ public class OaE_Logic : MonoBehaviour
     }
     public void OaE_PartI()
     {
+        character_Interaction.HideUI();
         character_Interaction.interactable = false;
         character_Interaction.tmp.enabled = false;
         characterMovement.canMove = false;
@@ -138,11 +141,13 @@ public class OaE_Logic : MonoBehaviour
             if (((firstIndex) + (secondIndex)) % 2 == 0)
             {
                 winTmp.enabled = true;
+                coin_Logic.UpdateCoin(200f);
                 StartCoroutine(character_Interaction.CloseOaEMenu());
             }
             else
             {
                 loseTmp.enabled = true;
+                coin_Logic.UpdateCoin(-200f);
                 StartCoroutine(character_Interaction.CloseOaEMenu());
             }
         }
@@ -177,11 +182,13 @@ public class OaE_Logic : MonoBehaviour
             if (((firstIndex) + (secondIndex)) % 2 == 0)
             {
                 loseTmp.enabled = true;
+                coin_Logic.UpdateCoin(-200f);
                 StartCoroutine(character_Interaction.CloseOaEMenu());
             }
             else
             {
                 winTmp.enabled = true;
+                coin_Logic.UpdateCoin(200f);
                 StartCoroutine(character_Interaction.CloseOaEMenu());
             }
         }

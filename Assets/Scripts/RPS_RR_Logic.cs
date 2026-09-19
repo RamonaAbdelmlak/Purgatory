@@ -18,6 +18,7 @@ public class RPS_RR_Logic : MonoBehaviour
     public GameObject click;
     public TextMeshProUGUI clickTmp;
     public int bullet = 6;
+    public Coin_Logic coin_Logic;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -29,6 +30,7 @@ public class RPS_RR_Logic : MonoBehaviour
         enemyHands[2] = GameObject.Find("Hand_scissors_1");
         player = GameObject.Find("Player");
         character_Interaction_Logic = player.GetComponent<Character_Interaction>();
+        coin_Logic = player.GetComponent<Coin_Logic>();
         gun = GameObject.Find("Purgatory_gun_0");
         gunSpriteRenderer = gun.GetComponent<SpriteRenderer>();
         gunAnimator = gun.GetComponent<Animator>();
@@ -36,6 +38,7 @@ public class RPS_RR_Logic : MonoBehaviour
         bangTmp = bang.GetComponent<TextMeshProUGUI>();
         click = GameObject.Find("Click...");
         clickTmp = click.GetComponent<TextMeshProUGUI>();
+        
     }
 
     // Update is called once per frame
@@ -83,6 +86,7 @@ public class RPS_RR_Logic : MonoBehaviour
         if (randNum == 0)
         {
             Debug.Log("RR Win");
+            coin_Logic.UpdateCoin(500f);
             bangTmp.enabled = true;
             canClose = true;
             bullet = 6;
@@ -115,6 +119,7 @@ public class RPS_RR_Logic : MonoBehaviour
         if (randNum == 0)
         {
             Debug.Log("RR Loss");
+            coin_Logic.UpdateCoin(-500f);
             bangTmp.enabled = true;
             canClose = true;
             bullet = 6;

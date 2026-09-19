@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using Unity.VisualScripting;
+using Microsoft.Unity.VisualStudio.Editor;
+using UnityEngine.UI;
 
 public class Character_Interaction : MonoBehaviour
 {
@@ -56,6 +58,33 @@ public class Character_Interaction : MonoBehaviour
     public int closeCount = 0;
     public bool OaE_Interactable = false;
     public bool nextStepOaE = false;
+    public GameObject coinUI;
+    public UnityEngine.UI.Image coinUIImg;
+    public GameObject coinCount;
+    public TextMeshProUGUI coinCountTmp;
+    public GameObject H_LCoinUI;
+    public UnityEngine.UI.Image H_LCoinUIImg;
+    public GameObject H_LCoinCount;
+    public TextMeshProUGUI H_LCoinCountTmp;
+    public GameObject RPS_RRCoinUI;
+    public UnityEngine.UI.Image RPS_RRCoinUIImg;
+    public GameObject RPS_RRCoinCount;
+    public TextMeshProUGUI RPS_RRCoinCountTmp;
+    public GameObject OaECoinUI;
+    public UnityEngine.UI.Image OaECoinUIImg;
+    public GameObject OaECoinCount;
+    public TextMeshProUGUI OaECoinCountTmp;
+    public GameObject ticketCoinUI;
+    public UnityEngine.UI.Image ticketCoinUIImg;
+    public GameObject ticketCoinCount;
+    public TextMeshProUGUI ticketCoinCountTmp;
+    public Coin_Logic coin_Logic;
+    public bool canBuyTicket = false;
+    public bool ticketCounterInteractable;
+    public GameObject gate;
+    public GameObject angelOne;
+    public GameObject angelTwo;
+
     
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -92,17 +121,45 @@ public class Character_Interaction : MonoBehaviour
         table = GameObject.Find("Table");
         table2 = GameObject.Find("Table2");
         characterMovement = GetComponent<Character_Movement>();
+        coin_Logic = GetComponent<Coin_Logic>();
         gun = GameObject.Find("Purgatory_gun_0");
         gunSpriteRenderer = gun.GetComponent<SpriteRenderer>();
         gunAnimator = gun.GetComponent<Animator>();
         OaE_Interact = GameObject.Find("OaE_Interact");
         OaE_Logic = OaE_Interact.GetComponent<OaE_Logic>();
+        coinUI = GameObject.Find("Coin UI");
+        coinUIImg = coinUI.GetComponent<UnityEngine.UI.Image>();
+        coinCount = GameObject.Find("Coin Count");
+        coinCountTmp = coinCount.GetComponent<TextMeshProUGUI>();
+        H_LCoinUI = GameObject.Find("H_L Coin UI");
+        H_LCoinUIImg = H_LCoinUI.GetComponent<UnityEngine.UI.Image>();
+        H_LCoinCount = GameObject.Find("H_L Coin Count");
+        H_LCoinCountTmp = H_LCoinCount.GetComponent<TextMeshProUGUI>();
+        RPS_RRCoinUI = GameObject.Find("RPS_RR Coin UI");
+        RPS_RRCoinUIImg = RPS_RRCoinUI.GetComponent<UnityEngine.UI.Image>();
+        RPS_RRCoinCount = GameObject.Find("RPS_RR Coin Count");
+        RPS_RRCoinCountTmp = RPS_RRCoinCount.GetComponent<TextMeshProUGUI>();
+        OaECoinUI = GameObject.Find("OaE Coin UI");
+        OaECoinUIImg = OaECoinUI.GetComponent<UnityEngine.UI.Image>();
+        OaECoinCount = GameObject.Find("OaE Coin Count");
+        OaECoinCountTmp = OaECoinCount.GetComponent<TextMeshProUGUI>();
+        ticketCoinUI = GameObject.Find("Ticket Coin UI");
+        ticketCoinUIImg = ticketCoinUI.GetComponent<UnityEngine.UI.Image>();
+        ticketCoinCount = GameObject.Find("Ticket Coin Count");
+        ticketCoinCountTmp = ticketCoinCount.GetComponent<TextMeshProUGUI>();
+        coin_Logic = GetComponent<Coin_Logic>();
+        gate = GameObject.Find("Purgatory_Gates_0");
+        angelOne = GameObject.Find("Purgatory_AngelNPC_0");
+        angelTwo = GameObject.Find("Purgatory_AngelNPC_1");    
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (coin_Logic.coinAmount >= 1000)
+        {
+            canBuyTicket = true;
+        }
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -122,6 +179,11 @@ public class Character_Interaction : MonoBehaviour
             tmp.enabled = true;
             OaE_Interactable = true;
         }
+        if (collision.gameObject.tag == "TC_Interact")
+        {
+            tmp.enabled = true;
+            ticketCounterInteractable = true;
+        }
     }
     void OnTriggerExit2D(Collider2D collision)
     {
@@ -135,16 +197,22 @@ public class Character_Interaction : MonoBehaviour
             tmp.enabled = false;
             RPS_RR_Interactable = false;
         }
-        if (collision.gameObject.tag == "OaE Interact")
+        if (collision.gameObject.tag == "OaE_Interact")
         {
             tmp.enabled = false;
             OaE_Interactable = false;
+        }
+        if (collision.gameObject.tag == "TC_Interact")
+        {
+            tmp.enabled = false;
+            ticketCounterInteractable = false;
         }
     }
     void OnInteract(InputValue value)
     {
         if (h_L_Interactable && interactable)
         {
+            HideUI();
             interactable = false;
             firstNumber = 0;
             secondNumber = 0;
@@ -165,7 +233,11 @@ public class Character_Interaction : MonoBehaviour
         {
             OaE_Logic.OaE_PartI();
         }
-
+        if (ticketCounterInteractable && canBuyTicket && interactable)
+        {
+            coin_Logic.UpdateCoin(-1000f);
+            BoughtTicket();
+        }
     }
     void OnQ(InputValue value)
     {
@@ -178,6 +250,7 @@ public class Character_Interaction : MonoBehaviour
             if (higherAndLowerLogic.CompareCards() == -1)
             {
                 winTmp.enabled = true;
+                coin_Logic.UpdateCoin(100f);
             }
             else if (higherAndLowerLogic.CompareCards() == 0)
             {
@@ -186,6 +259,7 @@ public class Character_Interaction : MonoBehaviour
             else
             {
                 loseTmp.enabled = true;
+                coin_Logic.UpdateCoin(-100f);
             }
             StartCoroutine(CloseH_LMenu());
         }
@@ -209,6 +283,7 @@ public class Character_Interaction : MonoBehaviour
             if (higherAndLowerLogic.CompareCards() == 1)
             {
                 winTmp.enabled = true;
+                coin_Logic.UpdateCoin(100f);
             }
             else if (higherAndLowerLogic.CompareCards() == 0)
             {
@@ -217,6 +292,7 @@ public class Character_Interaction : MonoBehaviour
             else
             {
                 loseTmp.enabled = true;
+                coin_Logic.UpdateCoin(-100f);
             }
             StartCoroutine(CloseH_LMenu());
         }
@@ -335,6 +411,7 @@ public class Character_Interaction : MonoBehaviour
     }
     public void RussianRoulettePartI()
     {
+        HideUI();
         RPS_RR_Logic.canClose = false;
         interactable = false;
         tmp.GetComponent<TextMeshProUGUI>().enabled = false;
@@ -396,6 +473,7 @@ public class Character_Interaction : MonoBehaviour
         higherAndLowerLogic.secondCard[secondNumber - 1].GetComponent<SpriteRenderer>().enabled = false;
         characterMovement.canMove = true;
         nextStepH_L = false;
+        ShowUI();
     }
     public IEnumerator CloseRPC_RRMenu()
     {
@@ -415,6 +493,7 @@ public class Character_Interaction : MonoBehaviour
         nextStepRPS_RR = false;
         interactable = true;
         closeCount++;
+        ShowUI();
     }
     public void CloseRPC_RRMenu_Quick()
     {
@@ -431,6 +510,7 @@ public class Character_Interaction : MonoBehaviour
         characterMovement.canMove = true;
         nextStepRPS_RR = false;
         interactable = true;
+        ShowUI();
     }
     public IEnumerator CloseOaEMenu()
     {
@@ -449,12 +529,45 @@ public class Character_Interaction : MonoBehaviour
         OaE_Logic.secondDieArray[3].GetComponent<SpriteRenderer>().enabled = false;
         OaE_Logic.secondDieArray[4].GetComponent<SpriteRenderer>().enabled = false;
         OaE_Logic.secondDieArray[5].GetComponent<SpriteRenderer>().enabled = false;
-        
         OaE_Logic.table3_SR.enabled = false;
         OaE_Logic.evenTmp.enabled = false;
         OaE_Logic.oddTmp.enabled = false;
         characterMovement.canMove = true;
         nextStepOaE = false;
         interactable = true;
+        ShowUI();
+    }
+    public void HideUI()
+    {
+        coinUIImg.enabled = false;
+        coinCountTmp.enabled = false;
+        H_LCoinUIImg.enabled = false;
+        H_LCoinCountTmp.enabled = false;
+        RPS_RRCoinUIImg.enabled = false;
+        RPS_RRCoinCountTmp.enabled = false;
+        OaECoinUIImg.enabled = false;
+        OaECoinCountTmp.enabled = false;
+        ticketCoinUIImg.enabled = false;
+        ticketCoinCountTmp.enabled = false;
+    }
+    public void ShowUI()
+    {
+        coinUIImg.enabled = true;
+        coinCountTmp.enabled = true;
+        H_LCoinUIImg.enabled = true;
+        H_LCoinCountTmp.enabled = true;
+        RPS_RRCoinUIImg.enabled = true;
+        RPS_RRCoinCountTmp.enabled = true;
+        OaECoinUIImg.enabled = true;
+        OaECoinCountTmp.enabled = true;
+        ticketCoinUIImg.enabled = true;
+        ticketCoinCountTmp.enabled = true;
+    }
+    public void BoughtTicket()
+    {
+        gate.GetComponent<BoxCollider2D>().enabled = false;
+        Destroy(gate);
+        angelOne.transform.Translate(-1,0,0);
+        angelTwo.transform.Translate(1,0,0);
     }
 }

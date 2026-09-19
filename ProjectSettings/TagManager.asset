@@ -8,6 +8,8 @@ TagManager:
   - H_L Interact
   - RPS_RR Interact
   - OaE_Interact
+  - TC_Interact
+  - Win_Field
   layers:
   - Default
   - TransparentFX
