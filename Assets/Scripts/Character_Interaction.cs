@@ -43,8 +43,15 @@ public class Character_Interaction : MonoBehaviour
     public bool h_L_Interactable = false;
     public bool nextStepH_L = false;
     public bool nextStepRPS_RR = false;
+    public bool RRWinStep = false;
+    public bool RRDrawStep = false;
+    public bool RRLoseStep = false;
     public int firstNumber;
     public int secondNumber;
+    public GameObject gun;
+    public SpriteRenderer gunSpriteRenderer;
+    public Animator gunAnimator;
+    public int closeCount = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -80,6 +87,9 @@ public class Character_Interaction : MonoBehaviour
         table = GameObject.Find("Table");
         table2 = GameObject.Find("Table2");
         characterMovement = GetComponent<Character_Movement>();
+        gun = GameObject.Find("Purgatory_gun_0");
+        gunSpriteRenderer = gun.GetComponent<SpriteRenderer>();
+        gunAnimator = gun.GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -132,21 +142,12 @@ public class Character_Interaction : MonoBehaviour
         }
         if (RPS_RR_Interactable && interactable)
         {
-            interactable = false;
-            tmp.GetComponent<TextMeshProUGUI>().enabled = false;
-            rRockTmp.enabled = true;
-            qPaperTmp.enabled = true;
-            fScissorsTmp.enabled = true;
-            rockHand.GetComponent<SpriteRenderer>().enabled = true;
-            paperHand.GetComponent<SpriteRenderer>().enabled = true;
-            scissorsHand.GetComponent<SpriteRenderer>().enabled = true;
-            table2.GetComponent<SpriteRenderer>().enabled = true;
-            characterMovement.canMove = false;
-            nextStepRPS_RR = true;
+            RussianRoulettePartI();
         }
     }
     void OnQ(InputValue value)
     {
+        Debug.Log(nextStepRPS_RR);
         if (nextStepH_L)
         {
             higherTmp.enabled = false;
@@ -169,26 +170,7 @@ public class Character_Interaction : MonoBehaviour
         }
         if (nextStepRPS_RR)
         {
-            rRockTmp.enabled = false;
-            qPaperTmp.enabled = false;
-            fScissorsTmp.enabled = false;
-            rockHand.GetComponent<SpriteRenderer>().enabled = false;
-            scissorsHand.GetComponent<SpriteRenderer>().enabled = false;
-            enemyHand = RPS_RR_Logic.EnemyHand();
-            enemyHand.GetComponent<SpriteRenderer>().enabled = true;
-            if (enemyHand == rRockEnemy)
-            {
-                winTmp.enabled = true;
-            }
-            else if (enemyHand == qPaperEnemy)
-            {
-                drawTmp.enabled = true;
-            }
-            else
-            {
-                loseTmp.enabled = true;
-            }
-            StartCoroutine(CloseRPC_RRMenu());
+            StartCoroutine(RPS_RR_StepII_Paper());
         }
     }
     void OnR(InputValue value)
@@ -215,54 +197,129 @@ public class Character_Interaction : MonoBehaviour
         }
         if (nextStepRPS_RR)
         {
-            rRockTmp.enabled = false;
-            qPaperTmp.enabled = false;
-            fScissorsTmp.enabled = false;
-            paperHand.GetComponent<SpriteRenderer>().enabled = false;
-            scissorsHand.GetComponent<SpriteRenderer>().enabled = false;
-            enemyHand = RPS_RR_Logic.EnemyHand();
-            enemyHand.GetComponent<SpriteRenderer>().enabled = true;
-            if (enemyHand == rRockEnemy)
-            {
-                drawTmp.enabled = true;
-            }
-            else if (enemyHand == qPaperEnemy)
-            {
-                loseTmp.enabled = true;
-            }
-            else
-            {
-                winTmp.enabled = true;
-            }
-            StartCoroutine(CloseRPC_RRMenu());
+            StartCoroutine(RPS_RR_StepII_Rock());
         }
     }
     public void OnF(InputValue value)
     {
         if (nextStepRPS_RR)
         {
-            rRockTmp.enabled = false;
-            qPaperTmp.enabled = false;
-            fScissorsTmp.enabled = false;
-            rockHand.GetComponent<SpriteRenderer>().enabled = false;
-            paperHand.GetComponent<SpriteRenderer>().enabled = false;
-            enemyHand = RPS_RR_Logic.EnemyHand();
-            enemyHand.GetComponent<SpriteRenderer>().enabled = true;
-            if (enemyHand == rRockEnemy)
-            {
-                loseTmp.enabled = true;
-            }
-            else if (enemyHand == qPaperEnemy)
-            {
-                winTmp.enabled = true;
-            }
-            else
-            {
-                drawTmp.enabled = true;
-            }
+            StartCoroutine(RPS_RR_StepII_Scissor());
+        }
+    }
+    public IEnumerator RPS_RR_StepII_Paper()
+    {
+        rRockTmp.enabled = false;
+        qPaperTmp.enabled = false;
+        fScissorsTmp.enabled = false;
+        rockHand.GetComponent<SpriteRenderer>().enabled = false;
+        scissorsHand.GetComponent<SpriteRenderer>().enabled = false;
+        enemyHand = RPS_RR_Logic.EnemyHand();
+        enemyHand.GetComponent<SpriteRenderer>().enabled = true;
+        if (enemyHand == rRockEnemy)
+        {
+            winTmp.enabled = true;
+            yield return new WaitForSeconds(3f);
+            RPS_RR_Logic.RussianRoulettePartII(1);
+        }
+        else if (enemyHand == qPaperEnemy)
+        {
+            drawTmp.enabled = true;
+            yield return new WaitForSeconds(3f);
+            RPS_RR_Logic.RussianRoulettePartII(0);
+        }
+        else
+        {
+            loseTmp.enabled = true;
+            yield return new WaitForSeconds(3f);
+            RPS_RR_Logic.RussianRoulettePartII(-1);
+        }
+
+        if (RPS_RR_Logic.canClose == true)
+        {
             StartCoroutine(CloseRPC_RRMenu());
         }
     }
+    public IEnumerator RPS_RR_StepII_Rock()
+    {
+        rRockTmp.enabled = false;
+        qPaperTmp.enabled = false;
+        fScissorsTmp.enabled = false;
+        paperHand.GetComponent<SpriteRenderer>().enabled = false;
+        scissorsHand.GetComponent<SpriteRenderer>().enabled = false;
+        enemyHand = RPS_RR_Logic.EnemyHand();
+        enemyHand.GetComponent<SpriteRenderer>().enabled = true;
+        if (enemyHand == rRockEnemy)
+        {
+            drawTmp.enabled = true;
+            yield return new WaitForSeconds(2f);
+            RPS_RR_Logic.RussianRoulettePartII(0);
+        }
+        else if (enemyHand == qPaperEnemy)
+        {
+            loseTmp.enabled = true;
+            yield return new WaitForSeconds(2f);
+            RPS_RR_Logic.RussianRoulettePartII(-1);
+        }
+        else
+        {
+            winTmp.enabled = true;
+            yield return new WaitForSeconds(2f);
+            RPS_RR_Logic.RussianRoulettePartII(1);
+        }
+        if (RPS_RR_Logic.canClose == true)
+        {
+            StartCoroutine(CloseRPC_RRMenu());
+        }
+    }
+    public IEnumerator RPS_RR_StepII_Scissor()
+    {
+        rRockTmp.enabled = false;
+        qPaperTmp.enabled = false;
+        fScissorsTmp.enabled = false;
+        rockHand.GetComponent<SpriteRenderer>().enabled = false;
+        paperHand.GetComponent<SpriteRenderer>().enabled = false;
+        enemyHand = RPS_RR_Logic.EnemyHand();
+        enemyHand.GetComponent<SpriteRenderer>().enabled = true;
+        if (enemyHand == rRockEnemy)
+        {
+            loseTmp.enabled = true;
+            yield return new WaitForSeconds(2f);
+            RPS_RR_Logic.RussianRoulettePartII(-1);
+        }
+        else if (enemyHand == qPaperEnemy)
+        {
+            winTmp.enabled = true;
+            yield return new WaitForSeconds(2f);
+            RPS_RR_Logic.RussianRoulettePartII(1);
+        }
+        else
+        {
+            drawTmp.enabled = true;
+            yield return new WaitForSeconds(2f);
+            RPS_RR_Logic.RussianRoulettePartII(0);
+        }
+        if (RPS_RR_Logic.canClose == true)
+        {
+            StartCoroutine(CloseRPC_RRMenu());
+        }
+    }
+    public void RussianRoulettePartI()
+    {
+        RPS_RR_Logic.canClose = false;
+        interactable = false;
+        tmp.GetComponent<TextMeshProUGUI>().enabled = false;
+        rRockTmp.enabled = true;
+        qPaperTmp.enabled = true;
+        fScissorsTmp.enabled = true;
+        rockHand.GetComponent<SpriteRenderer>().enabled = true;
+        paperHand.GetComponent<SpriteRenderer>().enabled = true;
+        scissorsHand.GetComponent<SpriteRenderer>().enabled = true;
+        table2.GetComponent<SpriteRenderer>().enabled = true;
+        characterMovement.canMove = false;
+        nextStepRPS_RR = true;
+    }
+    
     public IEnumerator CloseH_LMenu(){
         yield return new WaitForSeconds(3f);
         winTmp.enabled = false;
@@ -313,10 +370,13 @@ public class Character_Interaction : MonoBehaviour
     }
     public IEnumerator CloseRPC_RRMenu()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(2f);
+        RPS_RR_Logic.bangTmp.enabled = false;
         winTmp.enabled = false;
         drawTmp.enabled = false;
         loseTmp.enabled = false;
+        gunSpriteRenderer.enabled = false;
+        gunAnimator.Play("Gun Static");
         table2.GetComponent<SpriteRenderer>().enabled = false;
         rockHand.GetComponent<SpriteRenderer>().enabled = false;
         paperHand.GetComponent<SpriteRenderer>().enabled = false;
@@ -325,5 +385,23 @@ public class Character_Interaction : MonoBehaviour
         characterMovement.canMove = true;
         nextStepRPS_RR = false;
         interactable = true;
+        closeCount++;
     }
+    public void CloseRPC_RRMenu_Quick()
+    {
+        winTmp.enabled = false;
+        drawTmp.enabled = false;
+        loseTmp.enabled = false;
+        gunSpriteRenderer.enabled = false;
+        gunAnimator.Play("Gun Static");
+        // table2.GetComponent<SpriteRenderer>().enabled = false;
+        rockHand.GetComponent<SpriteRenderer>().enabled = false;
+        paperHand.GetComponent<SpriteRenderer>().enabled = false;
+        scissorsHand.GetComponent<SpriteRenderer>().enabled = false;
+        enemyHand.GetComponent<SpriteRenderer>().enabled = false;
+        characterMovement.canMove = true;
+        nextStepRPS_RR = false;
+        interactable = true;
+    }
+    
 }
