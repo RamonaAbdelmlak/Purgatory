@@ -7,6 +7,7 @@ TagManager:
   - Interact
   - H_L Interact
   - RPS_RR Interact
+  - OaE_Interact
   layers:
   - Default
   - TransparentFX

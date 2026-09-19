@@ -36,6 +36,8 @@ public class Character_Interaction : MonoBehaviour
     public Character_Movement characterMovement;
     public GameObject h_L_Interact;
     public GameObject RPS_RR_Interact;
+    public GameObject OaE_Interact;
+    public OaE_Logic OaE_Logic;
     public RPS_RR_Logic RPS_RR_Logic;
     public Higher_and_Lower_Logic higherAndLowerLogic;
     public bool interactable = true;
@@ -52,6 +54,9 @@ public class Character_Interaction : MonoBehaviour
     public SpriteRenderer gunSpriteRenderer;
     public Animator gunAnimator;
     public int closeCount = 0;
+    public bool OaE_Interactable = false;
+    public bool nextStepOaE = false;
+    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -90,6 +95,8 @@ public class Character_Interaction : MonoBehaviour
         gun = GameObject.Find("Purgatory_gun_0");
         gunSpriteRenderer = gun.GetComponent<SpriteRenderer>();
         gunAnimator = gun.GetComponent<Animator>();
+        OaE_Interact = GameObject.Find("OaE_Interact");
+        OaE_Logic = OaE_Interact.GetComponent<OaE_Logic>();
     }
 
     // Update is called once per frame
@@ -110,6 +117,11 @@ public class Character_Interaction : MonoBehaviour
             tmp.enabled = true;
             RPS_RR_Interactable = true;
         }
+        if (collision.gameObject.tag == "OaE_Interact")
+        {
+            tmp.enabled = true;
+            OaE_Interactable = true;
+        }
     }
     void OnTriggerExit2D(Collider2D collision)
     {
@@ -122,6 +134,11 @@ public class Character_Interaction : MonoBehaviour
         {
             tmp.enabled = false;
             RPS_RR_Interactable = false;
+        }
+        if (collision.gameObject.tag == "OaE Interact")
+        {
+            tmp.enabled = false;
+            OaE_Interactable = false;
         }
     }
     void OnInteract(InputValue value)
@@ -144,10 +161,14 @@ public class Character_Interaction : MonoBehaviour
         {
             RussianRoulettePartI();
         }
+        if (OaE_Interactable && interactable)
+        {
+            OaE_Logic.OaE_PartI();
+        }
+
     }
     void OnQ(InputValue value)
     {
-        Debug.Log(nextStepRPS_RR);
         if (nextStepH_L)
         {
             higherTmp.enabled = false;
@@ -171,6 +192,10 @@ public class Character_Interaction : MonoBehaviour
         if (nextStepRPS_RR)
         {
             StartCoroutine(RPS_RR_StepII_Paper());
+        }
+        if (nextStepOaE)
+        {
+            StartCoroutine(OaE_Logic.OaE_PartII(0));
         }
     }
     void OnR(InputValue value)
@@ -198,6 +223,10 @@ public class Character_Interaction : MonoBehaviour
         if (nextStepRPS_RR)
         {
             StartCoroutine(RPS_RR_StepII_Rock());
+        }
+        if (nextStepOaE)
+        {
+            StartCoroutine(OaE_Logic.OaE_PartII(1));
         }
     }
     public void OnF(InputValue value)
@@ -403,5 +432,29 @@ public class Character_Interaction : MonoBehaviour
         nextStepRPS_RR = false;
         interactable = true;
     }
-    
+    public IEnumerator CloseOaEMenu()
+    {
+        yield return new WaitForSeconds(2f);
+        winTmp.enabled = false;
+        loseTmp.enabled = false;
+        OaE_Logic.firstDieArray[0].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.firstDieArray[1].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.firstDieArray[2].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.firstDieArray[3].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.firstDieArray[4].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.firstDieArray[5].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.secondDieArray[0].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.secondDieArray[1].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.secondDieArray[2].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.secondDieArray[3].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.secondDieArray[4].GetComponent<SpriteRenderer>().enabled = false;
+        OaE_Logic.secondDieArray[5].GetComponent<SpriteRenderer>().enabled = false;
+        
+        OaE_Logic.table3_SR.enabled = false;
+        OaE_Logic.evenTmp.enabled = false;
+        OaE_Logic.oddTmp.enabled = false;
+        characterMovement.canMove = true;
+        nextStepOaE = false;
+        interactable = true;
+    }
 }
